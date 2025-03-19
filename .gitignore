@@ -1,0 +1,69 @@
+### Gradle ###
+HELP.md
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### STS (Spring Tool Suite) ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+### IntelliJ IDEA ###
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+### VS Code ###
+.vscode/
+
+### Logs ###
+logs/
+*.log
+logs/*.log
+!logs/.gitkeep
+
+### Compiled files ###
+target/
+bin/
+*.class
+*.jar
+*.war
+*.ear
+
+### Spring Boot ###
+/BOOT-INF/
+/META-INF/
+/org/
+
+### Environment & Configuration Files (보안) ###
+# 실제 환경 설정 파일은 Git에서 제외하고, 샘플 파일만 올릴 것!
+application.properties
+application.yml
+.env
+
+### Dependencies ###
+/mvnw
+/mvnw.cmd
+/.mvn/
+node_modules/
