@@ -19,7 +19,8 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/swagger-resources/**",
                                 "/webjars/**",
-                                "/api/users/signup"
+                                "/api/users/signup",
+                                "/api/users/login"
                         ).permitAll() // Swagger 및 정적 리소스에 대한 접근 허용
                         .anyRequest().authenticated()
                 )
