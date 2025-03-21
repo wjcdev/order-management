@@ -2,6 +2,7 @@ package com.example.controller;
 
 import com.example.dto.UserRequestDto;
 import com.example.dto.UserResponseDto;
+import com.example.entity.User;
 import com.example.security.JwtUtil;
 import com.example.service.UserService;
 import org.springframework.http.ResponseEntity;
@@ -28,14 +29,27 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    // 로그인 API
     @PostMapping("/login")
     public ResponseEntity<JwtResponse> login(@RequestBody UserRequestDto request) {
-        if ("testuser".equals(request.getUsername()) && "password123".equals(request.getPassword())) {
-            String token = jwtUtil.generateToken(request.getUsername());
-            return ResponseEntity.ok(new JwtResponse(token)); // JWT 토큰 반환
-        } else {
-            return ResponseEntity.status(401).body(new JwtResponse("로그인 실패"));
+        // 데이터베이스에서 사용자 정보 조회
+        User user = userService.findByUsername(request.getUsername());
+
+        // 사용자가 존재하는지 확인
+        if (user == null) {
+            System.out.println("❌ 사용자 없음");
+            return ResponseEntity.status(401).body(new JwtResponse("로그인 실패: 존재하지 않는 사용자"));
         }
+
+        // 비밀번호 검증 (실제 서비스에서는 BCryptPasswordEncoder 사용)
+        if (!user.getPassword().equals(request.getPassword())) {
+            System.out.println("❌ 비밀번호 불일치");
+            return ResponseEntity.status(401).body(new JwtResponse("로그인 실패: 비밀번호 불일치"));
+        }
+
+        // JWT 토큰 생성
+        System.out.println("✅ 로그인 성공");
+        String token = jwtUtil.generateToken(user.getUsername(), String.valueOf(user.getRole()));
+
+        return ResponseEntity.ok(new JwtResponse(token)); // JWT 토큰 반환
     }
 }
