@@ -1,50 +1,41 @@
 package com.example.config;
 
+import com.example.security.JwtFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 public class SecurityConfig {
-    private static final Logger log = LoggerFactory.getLogger(SecurityConfig.class);
-
-    @PostConstruct
-    public void init() {
-        log.info("✅ SecurityConfig Loaded: Custom Security settings are being applied.");
-    }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        log.info("🚀 Security FilterChain is being applied!");
-
+    public SecurityFilterChain filterChain(HttpSecurity http, JwtFilter jwtFilter) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())  // ✅ CSRF 완전 비활성화
+                .csrf(csrf -> csrf.disable()) // ✅ CSRF 비활성화
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/",  // ✅ 메인 페이지 허용
+                        .requestMatchers(                                "/",  // ✅ 메인 페이지 허용
                                 "/test",  // ✅ 테스트 페이지 허용
                                 "/api/users/signup",
                                 "/api/users/login",
                                 "/swagger-ui/**",
                                 "/swagger-resources/**",
                                 "/v3/api-docs/**",
-                                "/webjars/**"
-                        ).permitAll()  // ✅ 특정 URL은 인증 없이 허용
-                        .anyRequest().authenticated()  // ✅ 그 외 요청은 인증 필요
+                                "/webjars/**").permitAll() // ✅ 인증 없이 접근 가능
+                        .requestMatchers("/api/products/**").hasRole("USER")
+                        .anyRequest().authenticated()
                 )
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(org.springframework.security.config.http.SessionCreationPolicy.STATELESS)
-                )
-                .formLogin(form -> form.disable())  // ✅ 기본 로그인 폼 비활성화
-                .httpBasic(basic -> basic.disable())  // ✅ 기본 인증 방식 비활성화
-                .logout(logout -> logout.disable());  // ✅ 기본 로그아웃 기능 비활성화
-
-        log.info("🔥 SecurityConfig is fully loaded!");
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // ✅ 세션 사용 안 함
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class) // ✅ JWT 필터 적용
+                .formLogin(form -> form.disable())
+                .httpBasic(httpBasic -> httpBasic.disable());
 
         return http.build();
     }
 }
+
